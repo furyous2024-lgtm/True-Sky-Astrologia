@@ -1,0 +1,28 @@
+{
+  "name": "True Sky Astrology Software",
+  "short_name": "True Sky",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f172a",
+  "theme_color": "#273a72",
+  "description": "Online astrology software with chart calculations and community features",
+  "icons": [
+    {
+      "src": "./icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": [
+    "education",
+    "lifestyle"
+  ]
+}

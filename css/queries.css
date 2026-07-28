@@ -1,0 +1,611 @@
+/* Simple Responsive Menu */
+
+@media (max-width: 600px) {
+  /* Add small padding to prevent elements touching screen edges */
+  body {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  /* Adjust menu container spacing */
+  .menu {
+    margin-bottom: 4px;
+    gap: 4px;
+  }
+
+  /* Shorten COMPOSITE to COMP on mobile */
+  #composite-button span {
+    font-size: 0;
+  }
+
+  #composite-button span::after {
+    content: "COMP";
+    font-size: 12px;
+  }
+
+  #composite-button span.active-composite::after {
+    font-size: 13px;
+  }
+
+  /* Make menu buttons smaller on mobile */
+  .menu button {
+    width: 70px;
+  }
+
+  .menu button img {
+    width: 50px;
+    height: 50px;
+    margin-top: -5px;
+  }
+
+  .menu button span {
+    font-size: 12px;
+    letter-spacing: -0.3px;
+    min-height: 18px;
+  }
+
+  /* Adjust active state font size */
+  .menu button span.active-natal,
+  .menu button span.active-triwheel,
+  .menu button span.active-graph,
+  .menu button span.active-return,
+  .menu button span.active-community,
+  .menu button span.active-settings,
+  .menu button span.active-synastry,
+  .menu button span.active-composite,
+  .menu button span.active-help,
+  .menu button span.active-account {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 400px) {
+  /* Further reduce spacing on very small screens */
+  .menu {
+    margin-bottom: 2px;
+    gap: 2px;
+  }
+
+  /* Update COMP text size for 400px */
+  #composite-button span::after {
+    font-size: 9px;
+  }
+
+  #composite-button span.active-composite::after {
+    font-size: 10px;
+  }
+
+  /* Even smaller on very small screens */
+  .menu button {
+    width: 50px;
+  }
+
+  .menu button img {
+    width: 35px;
+    height: 35px;
+    margin-top: -5px;
+  }
+
+  .menu button span {
+    font-size: 9px;
+    letter-spacing: -0.5px;
+    min-height: 15px;
+  }
+
+  .menu button span.active-natal,
+  .menu button span.active-triwheel,
+  .menu button span.active-graph,
+  .menu button span.active-return,
+  .menu button span.active-community,
+  .menu button span.active-settings,
+  .menu button span.active-synastry,
+  .menu button span.active-composite,
+  .menu button span.active-help,
+  .menu button span.active-account {
+    font-size: 10px;
+  }
+}
+
+/* Form Responsive Styles */
+@media (max-width: 600px) {
+  /* Scale down form grid proportionally */
+  .form {
+    font-size: 18px;
+    grid-template-columns: 180px 26px 1px 26px 60px 42px;
+    grid-gap: 8px;
+  }
+
+  /* Prevent Start Date: and End Date: from stacking */
+  .form-section {
+    white-space: nowrap;
+  }
+
+  .form
+    input:not(.lat-deg):not(.lat-min):not(.lat-sec):not(.long-deg):not(
+      .long-min
+    ):not(.long-sec):not(.custom-location-input) {
+    font-size: 16px;
+    height: 24px;
+  }
+
+  .form select:not(.lat-dir):not(.long-dir) {
+    font-size: 16px;
+  }
+
+  /* Shorten "month" to "m" in date label */
+  .date-label {
+    font-size: 0;
+  }
+
+  .date-label::after {
+    content: "Date (dd-m-yyyy):";
+    font-size: 18px;
+  }
+
+  /* Shorten location label */
+  .location-label {
+    font-size: 0;
+  }
+
+  .location-label::after {
+    content: "Location (city, region):";
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  /* Scale down form grid even more */
+  .form {
+    /* font-size: 14px; */
+    grid-template-columns: 80px 26px 1px 26px 55px 44px;
+    grid-gap: 6px;
+  }
+
+  .form
+    input:not(.lat-deg):not(.lat-min):not(.lat-sec):not(.long-deg):not(
+      .long-min
+    ):not(.long-sec):not(.custom-location-input) {
+    /* font-size: 14px; */
+    height: 22px;
+  }
+
+  .form select:not(.lat-dir):not(.long-dir) {
+    /* font-size: 14px; */
+    height: 22px;
+  }
+
+  /* Make DMS inputs smaller at 420px */
+  .form .lat-deg,
+  .form .lat-min,
+  .form .lat-sec,
+  .form .long-min,
+  .form .long-sec {
+    width: 24px;
+    font-size: 16px;
+    padding: 6px 2px;
+  }
+
+  .form .long-deg {
+    width: 32px;
+    font-size: 16px;
+    padding: 6px 2px;
+  }
+
+  .form .lat-dir,
+  .form .long-dir {
+    min-width: 24px;
+    font-size: 12px;
+    padding: 8px 2px;
+  }
+
+  .custom-location-input {
+    font-size: 12px;
+  }
+
+  /* Shorten "month" to "m" in date label */
+  .date-label::after {
+    content: "Date:";
+    font-size: 18px;
+  }
+
+  /* Shorten location label */
+  .location-label::after {
+    content: "Location:";
+    font-size: 18px;
+  }
+
+  /* Shorten location label */
+  .time-label {
+    font-size: 0;
+  }
+
+  .time-label::after {
+    content: "Time:";
+    font-size: 18px;
+  }
+}
+
+/* Settings & Account Pages Responsive */
+@media (max-width: 600px) {
+  /* === WHEEL SETTINGS SECTION === */
+
+  /* Planet Symbol/Aspects: 5 cols → 4 cols */
+  .planet-settings {
+    grid-template-columns: repeat(4, auto);
+  }
+
+  /* Aspects with orb dropdowns: keep at 4 cols (it has 7 items, fits in 2 rows) */
+  /* No change needed for .aspect-settings-natal */
+
+  /* Graph Aspects (different section): 7 cols → 5 cols */
+  .aspect-settings:not(.aspect-settings-natal) {
+    grid-template-columns: repeat(5, auto);
+  }
+
+  /* Smaller orb dropdown selects */
+  .aspect-orb {
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+
+  /* Icons smaller */
+  .planet-icon,
+  .aspect-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* Smaller gaps */
+  .planet-settings,
+  .degree-settings,
+  .aspect-settings,
+  .graph-planet-settings,
+  .graph-type-settings,
+  .system-settings,
+  .ascendant-override {
+    gap: 8px;
+  }
+
+  /* Settings form grid adjustment */
+  .settings-form {
+    grid-template-columns: 160px 24px 1px 24px 60px 120px;
+    grid-gap: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Make each div containing checkbox and label a grid */
+  .graph-type-settings > div {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px;
+    align-items: start;
+  }
+}
+
+@media (max-width: 475px) {
+  /* Intermediate breakpoint for smoother aspect orb transition */
+  .aspect-settings-natal {
+    grid-template-columns: repeat(2, auto);
+  }
+}
+
+@media (max-width: 460px) {
+  /* Settings form further scaled */
+  .settings-form {
+    grid-template-columns: 60px 22px 1px 22px 50px 110px;
+    grid-gap: 4px;
+  }
+
+  .settings-form input {
+    height: 24px;
+  }
+
+  /* Shorten "Settings Name:" to "Name:" */
+  .settings-form .name-label {
+    font-size: 0;
+  }
+
+  .settings-form .name-label::after {
+    content: "Name:";
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  /* === WHEEL SETTINGS SECTION === */
+
+  /* Planet Symbol/Aspects: 4 cols → 3 cols */
+  .planet-settings {
+    grid-template-columns: repeat(3, auto);
+  }
+
+  /* Graph Aspects: 5 cols → 4 cols */
+  .aspect-settings:not(.aspect-settings-natal) {
+    grid-template-columns: repeat(4, auto);
+  }
+
+  /* Even smaller orb dropdowns */
+  .aspect-orb {
+    margin-left: 1px;
+    margin-right: 1px;
+  }
+
+  /* Smaller icons */
+  .planet-icon,
+  .aspect-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Tighter gaps */
+  .planet-settings,
+  .degree-settings,
+  .aspect-settings,
+  .graph-planet-settings,
+  .graph-type-settings,
+  .system-settings,
+  .ascendant-override {
+    gap: 6px;
+  }
+
+  /* Smaller checkboxes */
+  .planet-settings input[type="checkbox"],
+  .degree-settings input[type="checkbox"],
+  .aspect-settings input[type="checkbox"],
+  .graph-planet-settings input[type="checkbox"],
+  .graph-type-settings input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* System settings dropdowns narrower */
+  .system-settings select {
+    max-width: 160px;
+  }
+
+  .ascendant-override select {
+    width: 80px;
+  }
+
+  /* Stack checkbox above label for True Nodes/Lilith/Draconic */
+  .true-positions-row > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .true-positions-row .type-icon {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  /* Reduce space between checkboxes within each planet group */
+  .graph-planet-settings > div {
+    display: flex;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 350px) {
+  /* Make animation button text smaller */
+  .animation-control-btn {
+    font-size: 14px !important;
+    padding: 0px 12px !important;
+  }
+}
+
+/* Account Page - Fix wrapping behavior */
+@media (max-width: 500px) {
+  /* Center the confirm containers and let text wrap naturally */
+  .confirm-delete-container {
+    padding: 0 20px;
+    text-align: center;
+    display: block;
+  }
+
+  /* Make checkbox inline with text */
+  .confirm-delete-container input[type="checkbox"] {
+    display: inline;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .confirm-delete-container span {
+    display: inline;
+    vertical-align: middle;
+  }
+
+  /* Default location - convert to flexbox and center content */
+  .default-location {
+    padding: 0 20px;
+    display: flex;
+    align-items: flex-end; /* Changed from flex-start to align bottoms */
+    gap: 8px;
+    justify-content: center;
+  }
+
+  /* First div doesn't expand too much */
+  .default-location > div:first-child {
+    flex: 0 0 auto;
+    max-width: 300px;
+  }
+
+  /* Stack label above input within first div */
+  .default-location label {
+    display: block;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+
+  .default-location input {
+    width: 100%;
+  }
+
+  /* Button stays next to input */
+  #saveDefaultLocationBtn {
+    flex: 0 0 auto;
+  }
+}
+
+/* Graph popup/tooltip responsive - now handled in graph.js with zoom */
+
+@media (max-width: 420px) {
+  /* Planet description popup - position higher */
+  .planet-tooltip-instance {
+    position: relative;
+    top: -100px;
+    margin-bottom: -100px;
+  }
+
+  /* Cover the empty space at top with white */
+  .planet-tooltip-instance::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    height: 120px;
+    background: white;
+    z-index: -1;
+  }
+}
+
+/* Chat input layout fixes for mobile */
+@media (max-width: 600px) {
+  #chatInputRow {
+    gap: 5px; /* Reduce gap on mobile */
+    padding: 0 10px; /* Add padding so button doesn't touch edge */
+  }
+
+  #chatInput {
+    min-width: 0; /* Allow input to shrink properly */
+    flex: 1 1 auto; /* Ensure it can shrink */
+  }
+
+  #sendMessage {
+    flex-shrink: 0; /* Prevent button from shrinking */
+  }
+}
+
+/* Location suggestions box - make responsive on mobile */
+@media (max-width: 600px) {
+  .suggestions-box {
+    width: auto; /* Let it size based on left/right */
+    left: 8px; /* 8px from left edge */
+    right: 8px; /* 8px from right edge */
+    max-width: 448px; /* Keep original max width */
+    transform: none; /* Remove centering transform */
+  }
+}
+
+@media (max-width: 475px) {
+  .custom-location-input::placeholder {
+    opacity: 0;
+  }
+}
+/* More at 420px above */
+
+/* Custom Points Responsive Styles */
+@media (max-width: 600px) {
+  /* Custom points grid - smaller gaps to match other settings sections */
+  .custom-points-grid {
+    gap: 6px 12px;
+  }
+
+  /* Custom point row - smaller gap */
+  .custom-point-row {
+    gap: 3px;
+  }
+
+  /* Custom point row elements - smaller fonts */
+  .custom-point-number {
+    font-size: 18px;
+  }
+
+  .custom-point-name {
+    font-size: 16px;
+  }
+
+  .custom-point-delete {
+    font-size: 12px;
+    padding: 2px 5px;
+    margin-left: 2px;
+  }
+
+  /* Custom point input row - smaller gap */
+  .custompoint-input-row {
+    gap: 6px;
+  }
+
+  /* Custom point input - smaller */
+  .custom-point-input {
+    font-size: 16px;
+    width: 170px;
+  }
+
+  .custom-point-ghost {
+    font-size: 16px;
+  }
+
+  /* Error message smaller */
+  .errorMessageCustomPoints {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  /* Custom points grid - even smaller gaps to match other settings sections */
+  .custom-points-grid {
+    gap: 4px 8px;
+  }
+
+  /* Custom point row - even smaller gap */
+  .custom-point-row {
+    gap: 2px;
+  }
+
+  /* Custom point row elements - even smaller fonts */
+  .custom-point-number {
+    font-size: 16px;
+  }
+
+  .custom-point-name {
+    font-size: 14px;
+  }
+
+  .custom-point-delete {
+    font-size: 11px;
+    padding: 1px 4px;
+    margin-left: 2px;
+  }
+
+  /* Custom point row checkbox - match other settings checkboxes at this breakpoint */
+  .custom-point-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Custom point input row - even smaller gap */
+  .custompoint-input-row {
+    gap: 4px;
+  }
+
+  /* Custom point input - even smaller */
+  .custom-point-input {
+    font-size: 14px;
+    width: 140px;
+    padding: 2px 3px;
+  }
+
+  .custom-point-ghost {
+    font-size: 14px;
+    left: 4px;
+    top: 3px;
+  }
+
+  /* Error message smaller */
+  .errorMessageCustomPoints {
+    font-size: 16px;
+  }
+}
