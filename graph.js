@@ -540,7 +540,7 @@ const GRAPH_AYANAMSA_VALUES = {
   Tropical: 0,
   IAU: 28.6888982207,
   IAU2: 29.12,
-  IAUZeroAries: 31.8624778024,
+  IAUZeroAries: 31.198,
   MidpointJ2000: 31.2836,
   Lahiri: 24.19,
   FaganBradley: 24.97,
