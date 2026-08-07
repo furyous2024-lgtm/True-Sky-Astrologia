@@ -18,10 +18,13 @@ function circularDiff(from, to) {
   return Math.abs(diff);
 }
 
+const sortByRawAngle = (a, b) =>
+  a.rawAngle - b.rawAngle || a.originalIndex - b.originalIndex;
+
 function finalizeRenderOrder(items) {
   const orderedItems = [...items].sort(
     (a, b) =>
-      a.adjustedAngle - b.adjustedAngle ||
+      a.rawAngle - b.rawAngle ||
       ((a.renderPriority ?? 0) - (b.renderPriority ?? 0)) ||
       a.originalIndex - b.originalIndex,
   );
