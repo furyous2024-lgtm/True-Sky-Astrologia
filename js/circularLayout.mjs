@@ -20,7 +20,10 @@ function circularDiff(from, to) {
 
 function finalizeRenderOrder(items) {
   const orderedItems = [...items].sort(
-    (a, b) => a.adjustedAngle - b.adjustedAngle || a.originalIndex - b.originalIndex,
+    (a, b) =>
+      a.adjustedAngle - b.adjustedAngle ||
+      ((a.renderPriority ?? 0) - (b.renderPriority ?? 0)) ||
+      a.originalIndex - b.originalIndex,
   );
 
   orderedItems.forEach((item, index) => {

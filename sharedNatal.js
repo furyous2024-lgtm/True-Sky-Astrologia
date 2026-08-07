@@ -320,6 +320,47 @@ function dedupePlanetsForAspects(planets) {
   return [...byName.values()];
 }
 
+const PLANET_RENDER_PRIORITY = [
+  "Sun",
+  "Moon",
+  "Mercury",
+  "Venus",
+  "Mars",
+  "Jupiter",
+  "Saturn",
+  "Uranus",
+  "Neptune",
+  "Pluto",
+  "Chiron",
+  "North Node",
+  "South Node",
+  "Ceres",
+  "Vesta",
+  "Pallas",
+  "Juno",
+  "Lilith",
+  "Priapus",
+  "Part of Fortune",
+  "Part of Spirit",
+  "Vertex",
+  "Anti-Vertex",
+  "Galactic Center",
+  "Ascendant Symbol",
+  "Midheaven",
+  "Descendant",
+  "Imum Coeli",
+];
+
+function getPlanetRenderPriority(name, fallbackIndex = Number.MAX_SAFE_INTEGER) {
+  if (!name) return fallbackIndex;
+  const normalized = canonicalObjectName(name);
+  const found = PLANET_RENDER_PRIORITY.findIndex(
+    (item) => canonicalObjectName(item) === normalized,
+  );
+  if (found >= 0) return found;
+  return fallbackIndex;
+}
+
 function selectionIncludes(selection, objectName) {
   // Fail-open for the wheel: if saved settings are empty or the settings DOM did not load,
   // keep all built-in Swiss objects visible instead of rendering a blank chart.
@@ -4306,7 +4347,9 @@ export function sharedNatal(
         spacingDistance,
       );
       const orderedSymbols = [...spacedSymbols].sort(
-        (a, b) => (a.renderOrder ?? 0) - (b.renderOrder ?? 0),
+        (a, b) =>
+          (a.renderOrder ?? 0) - (b.renderOrder ?? 0) ||
+          (a.renderPriority ?? 0) - (b.renderPriority ?? 0),
       );
 
       // Draw planet symbols
@@ -5550,7 +5593,9 @@ export function sharedNatal(
             0.1,
           );
           const orderedSymbols = [...spacedSymbols].sort(
-            (a, b) => (a.renderOrder ?? 0) - (b.renderOrder ?? 0),
+            (a, b) =>
+              (a.renderOrder ?? 0) - (b.renderOrder ?? 0) ||
+              (a.renderPriority ?? 0) - (b.renderPriority ?? 0),
           );
           orderedSymbols.forEach((planet) => {
             // Adjusted angle for symbols
@@ -5867,7 +5912,9 @@ export function sharedNatal(
             0.08,
           );
           const orderedSymbols = [...spacedSymbols].sort(
-            (a, b) => (a.renderOrder ?? 0) - (b.renderOrder ?? 0),
+            (a, b) =>
+              (a.renderOrder ?? 0) - (b.renderOrder ?? 0) ||
+              (a.renderPriority ?? 0) - (b.renderPriority ?? 0),
           );
           orderedSymbols.forEach((planet) => {
             // Adjusted angle for symbols
@@ -6054,7 +6101,9 @@ export function sharedNatal(
               0.1,
             );
             const orderedSymbolsMiddle = [...spacedSymbolsMiddle].sort(
-              (a, b) => (a.renderOrder ?? 0) - (b.renderOrder ?? 0),
+              (a, b) =>
+                (a.renderOrder ?? 0) - (b.renderOrder ?? 0) ||
+                (a.renderPriority ?? 0) - (b.renderPriority ?? 0),
             );
             orderedSymbolsMiddle.forEach((planet) => {
               const adjustedAngle = planet.adjustedAngle;
@@ -6309,6 +6358,7 @@ export function symbolSpacing(
       rawAngle,
       adjustedAngle: rawAngle,
       isAnglePoint: isAnglePoint(planet),
+      renderPriority: getPlanetRenderPriority(planet?.name, planets.length + index),
     };
   });
 
