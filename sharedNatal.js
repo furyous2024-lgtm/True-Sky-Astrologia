@@ -1,4 +1,5 @@
 import { buildPrintWindowBridgeScript, buildSafeExportFileName, buttonCss, displayZodiacSystemLabel, escapeHtml, normalizeZodiacTextLabels, openInlinePrintFallback } from "./js/printExportShared.js?v=DELTA_SYNASTRY_FIX_20260617";
+import { distributeCircularObjects } from "./js/circularLayout.mjs";
 window.progressedPlanets = window.progressedPlanets || [];
 window.transitPlanets = window.transitPlanets || [];
 function getErrorMessage(error) {
@@ -6271,15 +6272,6 @@ export function sharedNatal(
 }
 
 // PLANET SYMBOL SPACING
-// Helper to get circular difference in radians:
-function circularDiff(a, b) {
-  const TWO_PI = 2 * Math.PI;
-  let diff = b - a;
-  diff = diff % TWO_PI;
-  if (diff < 0) diff += TWO_PI;
-  return diff;
-}
-
 function isAnglePoint(planet) {
   return isAngularPointName(planet?.name);
 }
@@ -6290,138 +6282,29 @@ export function symbolSpacing(
   ascendantPosition,
   minAngleSeparation = 0.12,
 ) {
-  // Early return if no planets or empty array
   if (!planets || planets.length === 0) {
     return [];
   }
 
-  const TWO_PI = 2 * Math.PI;
-  const normalizeAngle = (angle) => {
-    angle = angle % TWO_PI;
-    if (angle < 0) angle += TWO_PI;
-    return angle;
-  };
-
   const rawPlanetData = planets.map((planet, index) => {
     const renderPosition = getRenderablePosition(planet);
-    const rawRadians = normalizeAngle(
-      ((ascendantPosition - Number(renderPosition ?? planet.position) - 180) * Math.PI) / 180,
-    );
+    const rawAngle = ((ascendantPosition - Number(renderPosition ?? planet.position) - 180) * Math.PI) / 180;
 
     return {
       ...planet,
       renderPosition: Number.isFinite(renderPosition) ? renderPosition : planet.renderPosition,
       originalIndex: index,
-      rawAngle: rawRadians,
-      adjustedAngle: rawRadians,
+      rawAngle,
+      adjustedAngle: rawAngle,
       isAnglePoint: isAnglePoint(planet),
     };
   });
 
-  // ASC/MC/DSC/IC are structural angle symbols. They must stay glued to the
-  // exact house/cusp anchor, while planets, asteroids and custom points around
-  // them are shifted away. This prevents a planet from being drawn directly on
-  // top of ASC/MC/IC/DSC without detaching those four labels from their houses.
-  const lockedAngles = rawPlanetData.filter((planet) => planet.isAnglePoint);
-  const movablePlanets = rawPlanetData.filter((planet) => !planet.isAnglePoint);
-
-  if (rawPlanetData.length === 1 || movablePlanets.length === 0) {
-    return rawPlanetData.sort((a, b) => a.adjustedAngle - b.adjustedAngle || a.originalIndex - b.originalIndex);
-  }
-
-  const safeMinSeparation = Math.max(0.02, Number(minAngleSeparation) || 0.12);
-  const collisionPadding = 0.0006;
-
-  const signedDiff = (from, to) => {
-    let diff = normalizeAngle(to - from);
-    if (diff > Math.PI) diff -= TWO_PI;
-    return diff;
-  };
-
-  const moveAwayFromLockedAngles = (planet) => {
-    if (planet.isAnglePoint || lockedAngles.length === 0) return;
-
-    lockedAngles.forEach((locked, lockedIndex) => {
-      const diff = signedDiff(locked.adjustedAngle, planet.adjustedAngle);
-      const absDiff = Math.abs(diff);
-
-      if (absDiff < safeMinSeparation + collisionPadding) {
-        // Exact conjunctions need a deterministic side; otherwise stacked
-        // symbols choose the same direction and remain visually piled up.
-        const fallbackSide = ((planet.originalIndex + lockedIndex) % 2 === 0) ? 1 : -1;
-        const side = absDiff < 0.000001 ? fallbackSide : Math.sign(diff);
-        planet.adjustedAngle = normalizeAngle(
-          locked.adjustedAngle + side * (safeMinSeparation + collisionPadding),
-        );
-      }
-    });
-  };
-
-  // Reserve the angular-point zones before the general collision solver starts.
-  movablePlanets.forEach(moveAwayFromLockedAngles);
-
-  const allPlanets = [...lockedAngles, ...movablePlanets];
-
-  const relaxSymbolCollisions = (iterations) => {
-    for (let iteration = 0; iteration < iterations; iteration++) {
-      let changed = false;
-      allPlanets.sort((a, b) => a.adjustedAngle - b.adjustedAngle || a.originalIndex - b.originalIndex);
-
-      for (let i = 0; i < allPlanets.length; i++) {
-        const current = allPlanets[i];
-        const next = allPlanets[(i + 1) % allPlanets.length];
-        const gap = circularDiff(current.adjustedAngle, next.adjustedAngle);
-
-        if (gap >= safeMinSeparation) continue;
-        if (current.isAnglePoint && next.isAnglePoint) continue;
-
-        const push = safeMinSeparation - gap + collisionPadding;
-
-        if (current.isAnglePoint) {
-          next.adjustedAngle = normalizeAngle(next.adjustedAngle + push);
-        } else if (next.isAnglePoint) {
-          current.adjustedAngle = normalizeAngle(current.adjustedAngle - push);
-        } else {
-          current.adjustedAngle = normalizeAngle(current.adjustedAngle - push / 2);
-          next.adjustedAngle = normalizeAngle(next.adjustedAngle + push / 2);
-        }
-
-        changed = true;
-      }
-
-      // Keep the reserved ASC/MC/IC/DSC space intact after every relaxation
-      // pass, because a planet-vs-planet adjustment can otherwise push a glyph
-      // back onto an angular label.
-      movablePlanets.forEach(moveAwayFromLockedAngles);
-      if (!changed) break;
-    }
-  };
-
-  relaxSymbolCollisions(Math.max(80, allPlanets.length * 16));
-
-  // Deterministic pass for dense groups: keep movable objects in their visual
-  // order and enforce the standard gap between neighbors, then re-check the
-  // angular-point exclusion zones.
-  movablePlanets.sort((a, b) => a.rawAngle - b.rawAngle || a.originalIndex - b.originalIndex);
-  movablePlanets.forEach(moveAwayFromLockedAngles);
-
-  for (let i = 1; i < movablePlanets.length; i++) {
-    const prev = movablePlanets[i - 1];
-    const curr = movablePlanets[i];
-    const gap = circularDiff(prev.adjustedAngle, curr.adjustedAngle);
-
-    if (gap < safeMinSeparation) {
-      curr.adjustedAngle = normalizeAngle(prev.adjustedAngle + safeMinSeparation + collisionPadding);
-      moveAwayFromLockedAngles(curr);
-    }
-  }
-
-  // Final sweep catches wrap-around groups and chains created near 0°/360°.
-  relaxSymbolCollisions(Math.max(50, allPlanets.length * 10));
-
-  const combined = [...lockedAngles, ...movablePlanets];
-  combined.sort((a, b) => a.adjustedAngle - b.adjustedAngle || a.originalIndex - b.originalIndex);
-  return combined;
+  return distributeCircularObjects(rawPlanetData, {
+    minSeparation: Math.max(0.06, Number(minAngleSeparation) || 0.12),
+    lockGuard: 0.18,
+    isLocked: (item) => Boolean(item?.isAnglePoint),
+  });
 }
 
 // Show aspect interpretation popup
