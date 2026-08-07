@@ -4305,9 +4305,12 @@ export function sharedNatal(
         ascendantPosition,
         spacingDistance,
       );
+      const orderedSymbols = [...spacedSymbols].sort(
+        (a, b) => (a.renderOrder ?? 0) - (b.renderOrder ?? 0),
+      );
 
       // Draw planet symbols
-      spacedSymbols.forEach((planet) => {
+      orderedSymbols.forEach((planet) => {
         // Adjusted angle for symbols
         const adjustedAngle = planet.adjustedAngle;
         const displayPosition = getRenderablePosition(planet) ?? planet.position;
@@ -5546,7 +5549,10 @@ export function sharedNatal(
             ascendantPosition,
             0.1,
           );
-          spacedSymbols.forEach((planet) => {
+          const orderedSymbols = [...spacedSymbols].sort(
+            (a, b) => (a.renderOrder ?? 0) - (b.renderOrder ?? 0),
+          );
+          orderedSymbols.forEach((planet) => {
             // Adjusted angle for symbols
             const adjustedAngle = planet.adjustedAngle;
 
@@ -5860,7 +5866,10 @@ export function sharedNatal(
             ascendantPosition,
             0.08,
           );
-          spacedSymbols.forEach((planet) => {
+          const orderedSymbols = [...spacedSymbols].sort(
+            (a, b) => (a.renderOrder ?? 0) - (b.renderOrder ?? 0),
+          );
+          orderedSymbols.forEach((planet) => {
             // Adjusted angle for symbols
             const adjustedAngle = planet.adjustedAngle;
 
@@ -6044,7 +6053,10 @@ export function sharedNatal(
               ascendantPosition,
               0.1,
             );
-            spacedSymbolsMiddle.forEach((planet) => {
+            const orderedSymbolsMiddle = [...spacedSymbolsMiddle].sort(
+              (a, b) => (a.renderOrder ?? 0) - (b.renderOrder ?? 0),
+            );
+            orderedSymbolsMiddle.forEach((planet) => {
               const adjustedAngle = planet.adjustedAngle;
 
               const x =

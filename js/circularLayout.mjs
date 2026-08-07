@@ -18,6 +18,18 @@ function circularDiff(from, to) {
   return Math.abs(diff);
 }
 
+function finalizeRenderOrder(items) {
+  const orderedItems = [...items].sort(
+    (a, b) => a.adjustedAngle - b.adjustedAngle || a.originalIndex - b.originalIndex,
+  );
+
+  orderedItems.forEach((item, index) => {
+    item.renderOrder = index;
+  });
+
+  return orderedItems;
+}
+
 export function distributeCircularObjects(items, options = {}) {
   const minSeparation = Math.max(0.04, Number(options.minSeparation) || 0.12);
   const lockGuard = Math.max(minSeparation * 1.6, Number(options.lockGuard) || 0.16);
@@ -42,7 +54,7 @@ export function distributeCircularObjects(items, options = {}) {
   const movableItems = normalizedItems.filter((item) => !item.isLocked);
 
   if (normalizedItems.length === 1 || movableItems.length === 0) {
-    return normalizedItems.sort((a, b) => a.adjustedAngle - b.adjustedAngle || a.originalIndex - b.originalIndex);
+    return finalizeRenderOrder(normalizedItems);
   }
 
   const moveAwayFromLocked = (item) => {
@@ -114,5 +126,5 @@ export function distributeCircularObjects(items, options = {}) {
 
   relaxCollisions(Math.max(50, normalizedItems.length * 8));
 
-  return normalizedItems.sort((a, b) => a.adjustedAngle - b.adjustedAngle || a.originalIndex - b.originalIndex);
+  return finalizeRenderOrder(normalizedItems);
 }
