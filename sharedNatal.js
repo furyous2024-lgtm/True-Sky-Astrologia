@@ -1,5 +1,4 @@
 import { buildPrintWindowBridgeScript, buildSafeExportFileName, buttonCss, displayZodiacSystemLabel, escapeHtml, normalizeZodiacTextLabels, openInlinePrintFallback } from "./js/printExportShared.js?v=DELTA_SYNASTRY_FIX_20260617";
-import { distributeCircularObjects } from "./js/circularLayout.mjs";
 window.progressedPlanets = window.progressedPlanets || [];
 window.transitPlanets = window.transitPlanets || [];
 function getErrorMessage(error) {
@@ -6343,30 +6342,103 @@ export function symbolSpacing(
   ascendantPosition,
   minAngleSeparation = 0.12,
 ) {
-  if (!planets || planets.length === 0) {
-    return [];
+  if (!planets || planets.length === 0) return [];
+
+  const TWO_PI = 2 * Math.PI;
+  const normalizeAngle = (a) => {
+    a = a % TWO_PI;
+    if (a < 0) a += TWO_PI;
+    return a;
+  };
+
+  const annotated = planets.map((p) => ({
+    src: p,
+    natural: normalizeAngle(
+      ((ascendantPosition - p.position - 180) * Math.PI) / 180,
+    ),
+  }));
+
+  if (annotated.length === 1) {
+    return [{ ...annotated[0].src, adjustedAngle: annotated[0].natural }];
   }
 
-  const rawPlanetData = planets.map((planet, index) => {
-    const renderPosition = getRenderablePosition(planet);
-    const rawAngle = ((ascendantPosition - Number(renderPosition ?? planet.position) - 180) * Math.PI) / 180;
+  const N = annotated.length;
 
-    return {
-      ...planet,
-      renderPosition: Number.isFinite(renderPosition) ? renderPosition : planet.renderPosition,
-      originalIndex: index,
-      rawAngle,
-      adjustedAngle: rawAngle,
-      isAnglePoint: isAnglePoint(planet),
-      renderPriority: getPlanetRenderPriority(planet?.name, planets.length + index),
-    };
+  annotated.sort((a, b) => {
+    if (a.natural !== b.natural) return a.natural - b.natural;
+    return b.src.position - a.src.position;
   });
 
-  return distributeCircularObjects(rawPlanetData, {
-    minSeparation: Math.max(0.06, Number(minAngleSeparation) || 0.12),
-    lockGuard: 0.18,
-    isLocked: (item) => Boolean(item?.isAnglePoint),
-  });
+  let maxGap = -1;
+  let cutIdx = 0;
+  for (let i = 0; i < N; i += 1) {
+    const j = (i + 1) % N;
+    let gap = annotated[j].natural - annotated[i].natural;
+    if (j === 0) gap += TWO_PI;
+    if (gap > maxGap) {
+      maxGap = gap;
+      cutIdx = j;
+    }
+  }
+
+  const base = annotated[cutIdx].natural;
+  const linear = [];
+  for (let i = 0; i < N; i += 1) {
+    const orig = annotated[(cutIdx + i) % N];
+    let rel = orig.natural - base;
+    if (rel < 0) rel += TWO_PI;
+    linear.push({ src: orig.src, rel });
+  }
+
+  if ((N - 1) * minAngleSeparation > TWO_PI - minAngleSeparation - 1e-9) {
+    const step = TWO_PI / N;
+    return linear.map((item, idx) => ({
+      ...item.src,
+      adjustedAngle: normalizeAngle(base + idx * step),
+    }));
+  }
+
+  const blocks = [];
+  const startOf = (b) =>
+    b.sumRel / b.count - (minAngleSeparation * (b.count - 1)) / 2;
+  const endOf = (b) => startOf(b) + (b.count - 1) * minAngleSeparation;
+
+  for (let i = 0; i < N; i += 1) {
+    const block = { sumRel: linear[i].rel, count: 1, members: [i] };
+    while (blocks.length > 0) {
+      const prev = blocks[blocks.length - 1];
+      if (startOf(block) - endOf(prev) < minAngleSeparation - 1e-12) {
+        block.sumRel = prev.sumRel + block.sumRel;
+        block.count = prev.count + block.count;
+        block.members = prev.members.concat(block.members);
+        blocks.pop();
+      } else {
+        break;
+      }
+    }
+    blocks.push(block);
+  }
+
+  const spanStart = startOf(blocks[0]);
+  const spanEnd = endOf(blocks[blocks.length - 1]);
+  const span = spanEnd - spanStart;
+  const maxAllowedSpan = TWO_PI - minAngleSeparation;
+  const scale = span > maxAllowedSpan + 1e-9 ? maxAllowedSpan / span : 1;
+  const scaleOrigin = spanStart;
+
+  const linearFinal = new Array(N);
+  for (const b of blocks) {
+    const s = startOf(b);
+    b.members.forEach((idx, j) => {
+      const raw = s + j * minAngleSeparation;
+      linearFinal[idx] = scaleOrigin + (raw - scaleOrigin) * scale;
+    });
+  }
+
+  return linear.map((item, idx) => ({
+    ...item.src,
+    adjustedAngle: normalizeAngle(base + linearFinal[idx]),
+  }));
 }
 
 // Show aspect interpretation popup
