@@ -78,15 +78,12 @@ function showTriwheelBaseOrBlank() {
   const hasMainCalculation =
     storedNatalData && storedNatalData.day && storedNatalData.month && storedNatalData.year;
 
-  // After MAIN is calculated, TRANSIT opens with the first/main circle already
-  // drawn. The progression and transit circles stay empty until this form is
-  // filled and calculated.
+  // After MAIN is calculated, the transit page can render its startup shell.
+  // The initial shell is only a blank visual scaffold. It must never submit a
+  // real calculation request in the background, otherwise it races with the
+  // user's Calculate/arrow-driven submit and becomes intermittent.
   if (form && hasMainCalculation) {
     form.dataset.baseOnly = "true";
-    setTimeout(() => {
-      if (typeof form.requestSubmit === "function") form.requestSubmit();
-      else form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-    }, 0);
   }
 }
 

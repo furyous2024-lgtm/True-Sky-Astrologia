@@ -5162,20 +5162,20 @@ export function sharedNatal(
       Boolean(submitter) &&
       (submitter.id === "triwheelCalculate" || submitter.name === "calculate");
 
-    // boot render path: no submitter at all, only baseOnly startup
-    if (form === "triwheel" && this.dataset.baseOnly === "true" && !submitter) {
+    const isTriwheelBaseOnly = form === "triwheel" && this.dataset.baseOnly === "true";
+    const isSynastryBaseOnly = form === "synastry" && this.dataset.baseOnly === "true";
+
+    // This startup-only guard must not execute a full calculation. It only
+    // prevents the initial blank shell from running a real transit calculation.
+    if (isTriwheelBaseOnly && !userTriggeredTriwheelSubmit) {
       this.dataset.baseOnly = "false";
       return;
     }
 
-    // Real user submit: the Calculate button or an arrow-driven submit button
-    // must be allowed to pass through the same form logic. Clear the gate.
     if (userTriggeredTriwheelSubmit && this.dataset.baseOnly === "true") {
       this.dataset.baseOnly = "false";
     }
 
-    const isTriwheelBaseOnly = form === "triwheel" && this.dataset.baseOnly === "true";
-    const isSynastryBaseOnly = form === "synastry" && this.dataset.baseOnly === "true";
     const currentTriwheelRunId = ++triwheelRenderRunId;
 
     // Clear the previous triwheel overlay immediately so stale transit/progression
