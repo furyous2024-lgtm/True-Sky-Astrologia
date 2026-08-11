@@ -58,23 +58,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const triwheelForm = document.getElementById("triwheelForm");
     if (!triwheelForm) return;
 
-    // The startup path sets baseOnly=true to render the empty transit diagram and
-    // then auto-fires an initial submit. If a user arrow-adjusts the date before
-    // that startup request is consumed, we need to clear the boot-time lock so the
-    // new event can flow through the full calculation branch.
+    // Clear the startup-only protection when the user intentionally changes the
+    // date via the control panel. The boot rendering is a blank sentinel path.
     if (triwheelForm.dataset.baseOnly === "true") {
       triwheelForm.dataset.baseOnly = "false";
     }
 
-    if (typeof triwheelForm.requestSubmit === "function") {
-      triwheelForm.requestSubmit();
+    // Prefer the real visible button path: the browser's own button click will
+    // emit the submit bubble and is the path the app's listeners are already
+    // subscribed to. This is safer than forcing submit/requestSubmit directly.
+    const calculateButton = document.getElementById("triwheelCalculate");
+    if (calculateButton) {
+      calculateButton.click();
     } else {
-      const calculateButton = document.getElementById("triwheelCalculate");
-      if (calculateButton) {
-        calculateButton.click();
-      } else {
-        triwheelForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
-      }
+      triwheelForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
     }
   }
 
@@ -460,6 +457,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    const triwheelForm = document.getElementById("triwheelForm");
+    if (triwheelForm) {
+      triwheelForm.dataset.baseOnly = "false";
+    }
+
     // Update the form fields with the new date values
     setTriwheelFieldValues({
       triwheelDay: date.getDate().toString().padStart(2, "0"),
@@ -496,6 +498,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // Event listener for now button
   nowButton.addEventListener("click", () => {
     const today = new Date();
+    const triwheelForm = document.getElementById("triwheelForm");
+    if (triwheelForm) {
+      triwheelForm.dataset.baseOnly = "false";
+    }
 
     setTriwheelFieldValues({
       triwheelDay: today.getDate().toString().padStart(2, "0"),
