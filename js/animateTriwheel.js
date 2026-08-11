@@ -47,6 +47,37 @@ document.addEventListener("DOMContentLoaded", () => {
     field.dispatchEvent(new Event("input", { bubbles: true }));
     field.dispatchEvent(new Event("change", { bubbles: true }));
   }
+
+  function setTriwheelFieldValues(values) {
+    Object.entries(values).forEach(([id, value]) => {
+      setFieldValue(id, value);
+    });
+  }
+
+  function submitTriwheelForm() {
+    const triwheelForm = document.getElementById("triwheelForm");
+    if (!triwheelForm) return;
+
+    // The startup path sets baseOnly=true to render the empty transit diagram and
+    // then auto-fires an initial submit. If a user arrow-adjusts the date before
+    // that startup request is consumed, we need to clear the boot-time lock so the
+    // new event can flow through the full calculation branch.
+    if (triwheelForm.dataset.baseOnly === "true") {
+      triwheelForm.dataset.baseOnly = "false";
+    }
+
+    if (typeof triwheelForm.requestSubmit === "function") {
+      triwheelForm.requestSubmit();
+    } else {
+      const calculateButton = document.getElementById("triwheelCalculate");
+      if (calculateButton) {
+        calculateButton.click();
+      } else {
+        triwheelForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+      }
+    }
+  }
+
   const calculateButton = document.getElementById("triwheelCalculate");
   const triwheelChart = document.getElementById("triwheel-chart");
 
@@ -430,19 +461,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Update the form fields with the new date values
-    document.getElementById("triwheelDay").value = date.getDate();
-    document.getElementById("triwheelMonth").value =
-      monthNames[date.getMonth()];
-    document.getElementById("triwheelYear").value = astronomicalToHistoricalYear(date.getFullYear());
-    document.getElementById("triwheelHour").value = String(
-      date.getHours()
-    ).padStart(2, "0");
-    document.getElementById("triwheelMinute").value = String(
-      date.getMinutes()
-    ).padStart(2, "0");
+    setTriwheelFieldValues({
+      triwheelDay: date.getDate().toString().padStart(2, "0"),
+      triwheelMonth: monthNames[date.getMonth()],
+      triwheelYear: astronomicalToHistoricalYear(date.getFullYear()),
+      triwheelHour: String(date.getHours()).padStart(2, "0"),
+      triwheelMinute: String(date.getMinutes()).padStart(2, "0"),
+    });
 
     // Submit the form
-    calculateButton.click();
+    submitTriwheelForm();
   }
 
   // Event listener for left arrow (decrement)
@@ -469,13 +497,15 @@ document.addEventListener("DOMContentLoaded", () => {
   nowButton.addEventListener("click", () => {
     const today = new Date();
 
-    setFieldValue("triwheelDay", today.getDate());
-    setFieldValue("triwheelMonth", MONTH_NAMES[today.getMonth()]);
-    setFieldValue("triwheelYear", today.getFullYear());
-    setFieldValue("triwheelHour", String(today.getHours()).padStart(2, "0"));
-    setFieldValue("triwheelMinute", String(today.getMinutes()).padStart(2, "0"));
+    setTriwheelFieldValues({
+      triwheelDay: today.getDate().toString().padStart(2, "0"),
+      triwheelMonth: MONTH_NAMES[today.getMonth()],
+      triwheelYear: today.getFullYear(),
+      triwheelHour: String(today.getHours()).padStart(2, "0"),
+      triwheelMinute: String(today.getMinutes()).padStart(2, "0"),
+    });
 
-    calculateButton.click(); // Recalculate chart
+    submitTriwheelForm(); // Recalculate chart
   });
 
   // Observe changes to the SVG to re-apply wheel mode after recalculation
