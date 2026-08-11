@@ -58,15 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const triwheelForm = document.getElementById("triwheelForm");
     if (!triwheelForm) return;
 
-    // Clear the startup-only protection when the user intentionally changes the
-    // date via the control panel. The boot rendering is a blank sentinel path.
     if (triwheelForm.dataset.baseOnly === "true") {
       triwheelForm.dataset.baseOnly = "false";
     }
 
-    // Prefer the real visible button path: the browser's own button click will
-    // emit the submit bubble and is the path the app's listeners are already
-    // subscribed to. This is safer than forcing submit/requestSubmit directly.
     const calculateButton = document.getElementById("triwheelCalculate");
     if (calculateButton) {
       calculateButton.click();

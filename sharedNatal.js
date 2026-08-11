@@ -5156,6 +5156,24 @@ export function sharedNatal(
   document.getElementById(formId).addEventListener("submit", async function (e) {
     e.preventDefault();
 
+    const submitter = e?.submitter;
+    const userTriggeredTriwheelSubmit =
+      form === "triwheel" &&
+      Boolean(submitter) &&
+      (submitter.id === "triwheelCalculate" || submitter.name === "calculate");
+
+    // boot render path: no submitter at all, only baseOnly startup
+    if (form === "triwheel" && this.dataset.baseOnly === "true" && !submitter) {
+      this.dataset.baseOnly = "false";
+      return;
+    }
+
+    // Real user submit: the Calculate button or an arrow-driven submit button
+    // must be allowed to pass through the same form logic. Clear the gate.
+    if (userTriggeredTriwheelSubmit && this.dataset.baseOnly === "true") {
+      this.dataset.baseOnly = "false";
+    }
+
     const isTriwheelBaseOnly = form === "triwheel" && this.dataset.baseOnly === "true";
     const isSynastryBaseOnly = form === "synastry" && this.dataset.baseOnly === "true";
     const currentTriwheelRunId = ++triwheelRenderRunId;
