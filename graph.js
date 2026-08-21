@@ -590,7 +590,7 @@ const GRAPH_AYANAMSA_VALUES = {
   UshaShashi: 20.420772,
   ValensMoon: 23.158838,
   LarryEly: 28.003611,
-  Pistak: 26.87495,
+  Pistak: 27.3478186007,
   Takra: 24.533333,
   TakraI: 24.533333,
   TakraII: 24.533333,
